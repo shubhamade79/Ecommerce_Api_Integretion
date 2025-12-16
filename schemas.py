@@ -103,7 +103,7 @@ class OrderCreate(BaseModel):
     address_id: int
     card_id: int   # send 0 or null if COD
 
-class OrderResponse(BaseModel):
+class OrderResponse(OrderCreate):
     id: int
     address_id : int
     card_id : str
@@ -115,4 +115,12 @@ class OrderResponse(BaseModel):
     class Config:
         orm_mode = True
 
+class WishlistCreate(BaseModel):
+    user_id:int
+    product_id:int
 
+class WishlistResponse(WishlistCreate):
+    id : int
+
+    class Config:
+        orm_mode = True

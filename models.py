@@ -1,5 +1,3 @@
-from xmlrpc.client import DateTime
-
 from sqlalchemy import Column, Integer, String, Float, Boolean,ForeignKey
 from database import Base
 from sqlalchemy.orm import relationship
@@ -83,3 +81,11 @@ class Order(Base):
     quantity = Column(Integer, nullable=False)
     total_amount = Column(Float, nullable=False)
     status = Column(String(50), default="PLACED")
+
+class WishList(Base):
+    __tablename__= "wishlists"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.id"),)
+    product_id = Column(Integer, ForeignKey("product.id"),)
+
+
