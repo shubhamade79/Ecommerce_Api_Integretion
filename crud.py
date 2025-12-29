@@ -371,3 +371,34 @@ def get_user_orders(db: Session, user_id: int) -> list[schemas.OrderResponse]:
         order_list.append(order_response)
 
     return order_list
+
+def add_to_wishlist(db: Session, user_id: int, product_id: int):
+    existing = db.query(models.WishList).filter(models.WishList.user_id == user_id,models.WishList.product_id == product_id).first()
+
+    if existing:
+        raise HTTPException(status_code=400, detail="Product already in wishlist")
+
+    wishlist = models.WishList(
+        user_id=user_id,
+        product_id=product_id
+    )
+
+    db.add(wishlist)
+    db.commit()
+    db.refresh(wishlist)
+    return wishlist
+
+
+def get_user_wishlist(db: Session, user_id: int):
+    return db.query(models.WishList).filter(models.WishList.user_id == user_id).all()
+
+
+def remove_from_wishlist(db: Session, user_id: int, product_id: int):
+    wishlist = db.query(models.WishList).filter(models.WishList.user_id == user_id,models.WishList.product_id == product_id).first()
+
+    if not wishlist:
+        raise HTTPException(status_code=404, detail="Wishlist item not found")
+
+    db.delete(wishlist)
+    db.commit()
+    return {"message": "Removed from wishlist"}

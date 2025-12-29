@@ -116,11 +116,13 @@ class OrderResponse(OrderCreate):
         orm_mode = True
 
 class WishlistCreate(BaseModel):
-    user_id:int
-    product_id:int
+    product_id: int
+
 
 class WishlistResponse(WishlistCreate):
-    id : int
+    id: int
+    user_id: int
 
     class Config:
         orm_mode = True
+

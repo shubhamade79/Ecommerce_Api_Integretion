@@ -3,12 +3,23 @@ from fastapi import FastAPI, Depends, HTTPException,Query,Body
 from sqlalchemy.orm import Session
 import models, schemas, crud
 from database import engine, SessionLocal, Base
+from fastapi.middleware.cors import CORSMiddleware
+
 
 # Create tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Dependency for DB session
 def get_db():
     db = SessionLocal()
@@ -107,6 +118,18 @@ def add_order(user_id: int,order: schemas.OrderCreate,db: Session = Depends(get_
 @app.get("/user/{user_id}/order", response_model=list[schemas.OrderResponse],tags=["Orders"])
 def get_order(user_id: int,db: Session = Depends(get_db)):
     return crud.get_user_orders(db=db, user_id=user_id)
+
+@app.post("/user/{user_id}/wishlist",response_model=schemas.WishlistResponse,tags=["Wishlist"])
+def add_wishlist(user_id: int,wishlist: schemas.WishlistCreate,db: Session = Depends(get_db)):
+    return crud.add_to_wishlist(db=db,user_id=user_id,product_id=wishlist.product_id)
+
+@app.get("/user/{user_id}/wishlist",response_model=list[schemas.WishlistResponse],tags=["Wishlist"])
+def get_wishlist(user_id: int, db: Session = Depends(get_db)):
+    return crud.get_user_wishlist(db=db, user_id=user_id)
+
+@app.delete("/user/{user_id}/wishlist/{product_id}", tags=["Wishlist"])
+def delete_wishlist(user_id: int,product_id: int,db: Session = Depends(get_db)):
+    return crud.remove_from_wishlist(db=db,user_id=user_id,product_id=product_id)
 
 """
 from fastapi import FastAPI
